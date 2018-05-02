@@ -29,7 +29,7 @@ angular
         !sankeychart.svg || sankeychart.w < 500 ? sankeychart.w : sankeychart.w;
 
       sankeychart.h = 700;
-      sankeychart.margin = sankeychart.w / 100;
+      sankeychart.margin = 100;
 
       function prepareSankeyData() {
         //set up graph in same style as original example but empty
@@ -55,7 +55,8 @@ angular
             );
             totalTechList += qty;
             children[v] = {
-              qty: qty
+              qty: qty,
+              type: "tech"
             };
           });
           /*angular.forEach(fields, function(v, k) {
@@ -73,7 +74,8 @@ angular
 
           return {
             qty: totalTechList,
-            children: children
+            children: children,
+            type: "level"
           };
         }
 
@@ -134,26 +136,37 @@ angular
 
             return {
               qty: hojasTech.length,
-              total: hojasTech.length,
+              type: "company",
               children: children
             };
           })
           .map($scope.rawdata);
 
-        console.log("temp", temp);
+        var ref = {};
+
+        function setReferenceItem(key, data) {
+          ref[key] = {
+            type: data.type
+          };
+        }
 
         _.each(temp, function(c, company) {
+          setReferenceItem(company, c);
           _.each(c.children, function(t, level) {
+            setReferenceItem(level, t);
             data.push({
               source: company,
               target: level,
-              value: t.qty
+              value: t.qty,
+              type: t.type
             });
             _.each(t.children, function(e, tech) {
+              setReferenceItem(tech, e);
               data.push({
                 source: level,
                 target: tech,
-                value: e.qty
+                value: e.qty,
+                type: e.type
               });
             });
           });
@@ -203,7 +216,7 @@ angular
         //now loop through each nodes to make nodes an array of objects
         // rather than an array of strings
         graph.nodes.forEach(function(d, i) {
-          graph.nodes[i] = { "node:": i, name: d };
+          graph.nodes[i] = { "node:": i, name: d, data: ref[d] };
         });
 
         return graph;
@@ -306,10 +319,13 @@ angular
           return d.dy / 2;
         })
         .attr("x", function(d) {
-          return isNaN(d.name) ? -3 : 3 + sankeychart.sankey.nodeWidth();
+          console.log(d);
+          return d.data.type != "company"
+            ? -3
+            : 3 + sankeychart.sankey.nodeWidth();
         })
         .attr("text-anchor", function(d) {
-          return isNaN(d.name) ? "end" : "start";
+          return d.data.type != "company" ? "end" : "start";
         })
         .attr("dy", ".35em")
         .attr("transform", null)

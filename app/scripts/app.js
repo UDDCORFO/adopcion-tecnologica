@@ -144,25 +144,25 @@ angular
 
     $rootScope.fieldNames = {
       basic: {
-        adopt_digitech_online: "digitech online",
-        adopt_digitech_web: "digitech web",
-        adopt_digitech_ecommerce: "digitech ecommerce",
-        adopt_digitech_socialmedia: "digitech socialmedia",
-        adopt_digitech_erp: "digitech erp",
-        adopt_digitech_diseno: "digitech diseno",
-        adopt_digitech_crm: "digitech crm"
+        adopt_digitech_online: "Online",
+        adopt_digitech_web: "Web",
+        adopt_digitech_ecommerce: "Ecommerce",
+        adopt_digitech_socialmedia: "Social Media",
+        adopt_digitech_erp: "ERP",
+        adopt_digitech_diseno: "Diseño",
+        adopt_digitech_crm: "CRM"
       },
       advanced: {
-        adopt_digitech_bigdata: "adopt digitech bigdata",
-        adopt_digitech_iot: "adopt digitech iot",
-        adopt_digitech_cloud: "adopt digitech cloud",
-        adopt_digitech_virtreality: "adopt digitech virtreality",
-        adopt_digitech_cogtech: "adopt digitech cogtech",
-        adopt_digitech_other: "adopt digitech other"
+        adopt_digitech_bigdata: "Big Data",
+        adopt_digitech_iot: "IOT",
+        adopt_digitech_cloud: "Cloud",
+        adopt_digitech_virtreality: "VR",
+        adopt_digitech_cogtech: "Cogtech",
+        adopt_digitech_other: "Other"
       },
       none: {
-        adopt_digitech_notsure: "adopt digitech notsure",
-        adopt_digitech_none: "adopt digitech none"
+        adopt_digitech_notsure: "No estoy seguro",
+        adopt_digitech_none: "Ninguna"
       }
     };
   });
