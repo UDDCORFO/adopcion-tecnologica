@@ -133,4 +133,36 @@ angular
         "#EF830C",
         "#E31F20"
       ]);
+
+    $rootScope.catNames = {
+      tech: "Tecnológico",
+      no_tech: "No tecnológico",
+      basic: "Tecnología básica",
+      advanced: "Tecnología avanzada",
+      none: "No adoptó nada"
+    };
+
+    $rootScope.fieldNames = {
+      basic: {
+        adopt_digitech_online: "digitech online",
+        adopt_digitech_web: "digitech web",
+        adopt_digitech_ecommerce: "digitech ecommerce",
+        adopt_digitech_socialmedia: "digitech socialmedia",
+        adopt_digitech_erp: "digitech erp",
+        adopt_digitech_diseno: "digitech diseno",
+        adopt_digitech_crm: "digitech crm"
+      },
+      advanced: {
+        adopt_digitech_bigdata: "adopt digitech bigdata",
+        adopt_digitech_iot: "adopt digitech iot",
+        adopt_digitech_cloud: "adopt digitech cloud",
+        adopt_digitech_virtreality: "adopt digitech virtreality",
+        adopt_digitech_cogtech: "adopt digitech cogtech",
+        adopt_digitech_other: "adopt digitech other"
+      },
+      none: {
+        adopt_digitech_notsure: "adopt digitech notsure",
+        adopt_digitech_none: "adopt digitech none"
+      }
+    };
   });
