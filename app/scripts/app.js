@@ -29,6 +29,11 @@ angular
         controller: "SankeyCtrl",
         controllerAs: "sankey"
       })
+      .when("/pack", {
+        templateUrl: "views/pack.html",
+        controller: "PackCtrl",
+        controllerAs: "pack"
+      })
       .otherwise({
         redirectTo: "/"
       });
@@ -121,8 +126,8 @@ angular
     };
   })
   .run(function($rootScope) {
-    $rootScope.tipo_colors = d3.scale
-      .ordinal()
+    $rootScope.tipo_colors = d3
+      .scaleOrdinal()
       .range([
         "#036633",
         "#698AC6",
@@ -164,5 +169,103 @@ angular
         adopt_digitech_notsure: "No estoy seguro",
         adopt_digitech_none: "Ninguna"
       }
+    };
+
+    $rootScope.fieldNamesFull = Object.assign(
+      $rootScope.fieldNames.basic,
+      $rootScope.fieldNames.advanced,
+      $rootScope.fieldNames.none
+    );
+
+    $rootScope.groupResults = function(data) {
+      var totales = d3
+        .nest()
+        .key(function(d) {
+          return d.tech_entrepreneur
+            ? $rootScope.catNames["tech"]
+            : $rootScope.catNames["no_tech"];
+        })
+        .rollup(function(hojasTech) {
+          var basic = hojasTech.filter(function(n) {
+            return n.rcount_basictech > 0;
+          });
+          var advanced = hojasTech.filter(function(n) {
+            return n.rcount_advancetech > 0;
+          });
+          var none = hojasTech.filter(function(n) {
+            return n.adopt_notech == true;
+          });
+          var children = {};
+          children[
+            $rootScope.catNames["advanced"]
+          ] = $rootScope.calculateQtyTech(advanced, "advanced");
+          children[$rootScope.catNames["basic"]] = $rootScope.calculateQtyTech(
+            basic,
+            "basic"
+          );
+          children[$rootScope.catNames["none"]] = $rootScope.calculateQtyTech(
+            none,
+            "none"
+          );
+
+          return {
+            qty: hojasTech.length,
+            type: "company",
+            children: children
+          };
+        })
+        .map(data);
+
+      var temp = [];
+      angular.forEach(totales, function(value, k) {
+        value.name = k;
+
+        var childrentemp = [];
+        angular.forEach(value.children, function(value, k) {
+          value.name = k;
+
+          var grandchildrentemp = [];
+          angular.forEach(value.children, function(value, k) {
+            value.name = k;
+
+            grandchildrentemp.push(value);
+          });
+          value.children = grandchildrentemp;
+
+          childrentemp.push(value);
+        });
+        value.children = childrentemp;
+
+        temp.push(value);
+      });
+
+      return temp;
+    };
+
+    $rootScope.calculateQtyTech = function(techList, type) {
+      var fields = $rootScope.fieldNames[type];
+
+      var children = {};
+      var totalTechList = 0;
+      angular.forEach(fields, function(v, k) {
+        var qty = _.reduce(
+          techList,
+          function(sum, n) {
+            return sum + (n[k] == true ? 1 : 0);
+          },
+          0
+        );
+        totalTechList += qty;
+        children[v] = {
+          qty: qty,
+          type: "tech"
+        };
+      });
+
+      return {
+        qty: totalTechList,
+        children: children,
+        type: "level"
+      };
     };
   });

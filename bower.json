@@ -11,7 +11,7 @@
     "angular-sanitize": "^1.4.0",
     "angular-touch": "^1.4.0",
     "tabletop": "^1.5.3",
-    "d3": "3",
+    "d3": "5",
     "lodash": "^4.17.5"
   },
   "devDependencies": {

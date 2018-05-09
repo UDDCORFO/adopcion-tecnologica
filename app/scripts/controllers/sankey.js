@@ -59,18 +59,6 @@ angular
               type: "tech"
             };
           });
-          /*angular.forEach(fields, function(v, k) {
-            var final = children[v].qty * total / totalTechList;
-            console.log(
-              type,
-              totalTechList,
-              total,
-              children[v].qty,
-              "res",
-              Math.round(final)
-            );
-            children[v].qty = final;
-          });*/
 
           return {
             qty: totalTechList,
@@ -151,8 +139,10 @@ angular
         }
 
         _.each(temp, function(c, company) {
+          company = company.replace("$", "");
           setReferenceItem(company, c);
           _.each(c.children, function(t, level) {
+            level = level.replace("$", "");
             setReferenceItem(level, t);
             data.push({
               source: company,
@@ -161,6 +151,7 @@ angular
               type: t.type
             });
             _.each(t.children, function(e, tech) {
+              tech = tech.replace("$", "");
               setReferenceItem(tech, e);
               data.push({
                 source: level,
@@ -175,18 +166,21 @@ angular
         var links = {};
 
         data.forEach(function(d) {
-          graph.nodes.push({ name: d.source });
-          graph.nodes.push({ name: d.target });
+          var s = d.source.replace("$", "");
+          var t = d.target.replace("$", "");
 
-          if (!links[d.source + "|" + d.target]) {
-            links[d.source + "|" + d.target] = {
-              source: d.source,
-              target: d.target,
+          graph.nodes.push({ name: s });
+          graph.nodes.push({ name: t });
+
+          if (!links[s + "|" + t]) {
+            links[s + "|" + t] = {
+              source: s,
+              target: t,
               value: 0
             };
           }
 
-          links[d.source + "|" + d.target].value += d.value;
+          links[s + "|" + t].value += d.value;
 
           /*graph.links.push({ "source": d.source,
                              "target": d.target,
@@ -206,6 +200,14 @@ angular
             })
             .map(graph.nodes)
         );
+
+        graph.nodes = graph.nodes
+          .filter(function(d) {
+            return d.indexOf("$") == 0 ? true : false;
+          })
+          .map(function(d) {
+            return d.replace("$", "");
+          });
 
         // loop through each link replacing the text with its index from node
         graph.links.forEach(function(d, i) {
@@ -319,7 +321,6 @@ angular
           return d.dy / 2;
         })
         .attr("x", function(d) {
-          console.log(d);
           return d.data.type != "company"
             ? -3
             : 3 + sankeychart.sankey.nodeWidth();
