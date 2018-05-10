@@ -126,6 +126,60 @@ angular
     };
   })
   .run(function($rootScope) {
+    $rootScope.thresdhold = {
+      basic: d3
+        .scaleThreshold()
+        .domain([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
+        .range(
+          [
+            "#7997ca",
+            "#809ccd",
+            "#87a1cf",
+            "#8ea6d2",
+            "#94abd5",
+            "#9bb0d7",
+            "#a1b5da",
+            "#a8bbdd",
+            "#afc0df",
+            "#b5c5e2"
+          ].reverse()
+        ),
+      advanced: d3
+        .scaleThreshold()
+        .domain([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
+        .range(
+          [
+            "#26754a",
+            "#337c52",
+            "#3e825b",
+            "#498964",
+            "#53906d",
+            "#5e9775",
+            "#689d7e",
+            "#72a488",
+            "#7cab91",
+            "#86b29a"
+          ].reverse()
+        ),
+      none: d3
+        .scaleThreshold()
+        .domain([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
+        .range(
+          [
+            "#9f724e",
+            "#a87e5c",
+            "#b1896b",
+            "#b9957a",
+            "#c2a189",
+            "#caae98",
+            "#d2baa8",
+            "#dac7b8",
+            "#e2d3c8",
+            "#eae0d8"
+          ].reverse()
+        )
+    };
+
     $rootScope.tipo_colors = d3
       .scaleOrdinal()
       .range([
@@ -171,13 +225,13 @@ angular
       }
     };
 
-    $rootScope.fieldNamesFull = Object.assign(
+    /*$rootScope.fieldNamesFull = Object.assign(
       $rootScope.fieldNames.basic,
       $rootScope.fieldNames.advanced,
       $rootScope.fieldNames.none
-    );
+    );*/
 
-    $rootScope.groupResults = function(data) {
+    $rootScope.groupResults = function(data, toArray) {
       var totales = d3
         .nest()
         .key(function(d) {
@@ -186,7 +240,7 @@ angular
             : $rootScope.catNames["no_tech"];
         })
         .rollup(function(hojasTech) {
-          var basic = hojasTech.filter(function(n) {
+          /*var basic = hojasTech.filter(function(n) {
             return n.rcount_basictech > 0;
           });
           var advanced = hojasTech.filter(function(n) {
@@ -194,59 +248,62 @@ angular
           });
           var none = hojasTech.filter(function(n) {
             return n.adopt_notech == true;
-          });
+          });*/
           var children = {};
-          children[
-            $rootScope.catNames["advanced"]
-          ] = $rootScope.calculateQtyTech(advanced, "advanced");
           children[$rootScope.catNames["basic"]] = $rootScope.calculateQtyTech(
-            basic,
+            hojasTech,
             "basic"
           );
+          children[
+            $rootScope.catNames["advanced"]
+          ] = $rootScope.calculateQtyTech(hojasTech, "advanced");
           children[$rootScope.catNames["none"]] = $rootScope.calculateQtyTech(
-            none,
+            hojasTech,
             "none"
           );
 
           return {
-            qty: hojasTech.length,
+            total: hojasTech.length,
             type: "company",
             children: children
           };
         })
         .map(data);
 
-      var temp = [];
-      angular.forEach(totales, function(value, k) {
-        value.name = k;
+      if (toArray) {
+        var temp = [];
+        angular.forEach(totales, function(value, k) {
+          value.name = k.replace("$", "");
 
-        var childrentemp = [];
-        angular.forEach(value.children, function(value, k) {
-          value.name = k;
-
-          var grandchildrentemp = [];
+          var childrentemp = [];
           angular.forEach(value.children, function(value, k) {
             value.name = k;
 
-            grandchildrentemp.push(value);
+            var grandchildrentemp = [];
+            angular.forEach(value.children, function(value, k) {
+              value.name = k;
+
+              grandchildrentemp.push(value);
+            });
+            value.children = grandchildrentemp;
+
+            childrentemp.push(value);
           });
-          value.children = grandchildrentemp;
+          value.children = childrentemp;
 
-          childrentemp.push(value);
+          temp.push(value);
         });
-        value.children = childrentemp;
-
-        temp.push(value);
-      });
-
-      return temp;
+        return temp;
+      } else {
+        return totales;
+      }
     };
 
     $rootScope.calculateQtyTech = function(techList, type) {
       var fields = $rootScope.fieldNames[type];
 
       var children = {};
-      var totalTechList = 0;
+      //var totalTechList = 0;
       angular.forEach(fields, function(v, k) {
         var qty = _.reduce(
           techList,
@@ -255,17 +312,23 @@ angular
           },
           0
         );
-        totalTechList += qty;
+        //totalTechList += qty;
         children[v] = {
+          parentType: "level",
+          parentId: type,
           qty: qty,
           type: "tech"
         };
       });
 
       return {
-        qty: totalTechList,
+        id: type,
         children: children,
         type: "level"
       };
+    };
+
+    $rootScope.formatProportion = function(qty, total) {
+      return Math.round(qty * 100 / total);
     };
   });

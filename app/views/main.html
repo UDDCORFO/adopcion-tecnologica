@@ -1,9 +1,28 @@
+<div id="main">
 <p class="text-center"><span ng-if="loading">Cargando...</span></p>
 <div class="row">
   <div class="col-md-4">
       <div class="jumbotron text-center">
           <h1><span ng-if="!loading">{{rawdata.length}}</span><span ng-if="loading">...</span></h1>
-          <p>registros</p>
+          <p>TOTAL</p>
       </div>
   </div>
+  <div class="col-md-4" ng-repeat="(ixc,company) in totales">
+      <div class="jumbotron">
+          <h1 class="text-center"><span ng-if="!loading">{{company.total}}</span><span ng-if="loading">...</span></h1>
+          <p class="text-center">{{company.name}}</p>
+          <ul>
+			  <li ng-repeat="(ixl,level) in company.children" ng-style="{color:thresdhold[level.id](100)}">
+			  	{{level.name}}
+			  	<ol>
+				  <li class="qty-item" ng-repeat="(ixt,tech) in level.children | orderBy:'-qty' " ng-style="{color:thresdhold[level.id](tech.qty)}">
+				  	{{tech.name}} - {{tech.qty}} - Adopción: {{formatProportion(tech.qty,company.total)}}%
+				  </li>
+				</ol>
+			  </li>
+			</ul>
+      </div>
+  </div>
+ 
+</div>
 </div>

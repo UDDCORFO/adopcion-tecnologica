@@ -14,21 +14,11 @@ angular
     TabletopService.getData().then(function(data) {
       $scope.loading = false;
 
-      /*$scope.rawdata = d3
-        .nest()
-        .key(function(d) {
-          return d.tech_entrepreneur
-            ? $scope.catNames["tech"]
-            : $scope.catNames["no_tech"];
-        })
-        .map(data);*/
-
-      $scope.total = $rootScope.groupResults(data);
+      $scope.total = $rootScope.groupResults(data, true);
 
       console.log("TOTAL!", $scope.total);
 
-      renderPackChart("pack-tech-chart-container", $scope.total);
-      //renderPackChart('pack-notech-chart-container',$scope.rawdata[$scope.catNames["no_tech"]]);
+      renderPackChart("pack-chart-container", $scope.total);
     });
 
     function format(str) {
@@ -57,6 +47,7 @@ angular
 
       var root = d3
         .hierarchy({
+          type: "root",
           name: container,
           children: data
         })
@@ -88,10 +79,25 @@ angular
       svgNodes
         .append("circle")
         .style("fill", function(d) {
-          return "none";
+          return d.data.parentType == "level"
+            ? $rootScope.thresdhold[d.data.parentId](d.data.qty)
+            : "none";
         })
         .style("stroke", function(d) {
-          return "black";
+          var t = "";
+          switch (d.data.type) {
+            case "company":
+              t = "gray";
+              break;
+            case "level":
+              t = $rootScope.thresdhold[d.data.id](100);
+              break;
+            case "tech":
+            case "root":
+              t = "none";
+              break;
+          }
+          return t;
         })
         .attr("r", function(d) {
           return d.r;
@@ -105,11 +111,22 @@ angular
         .style("text-anchor", function(d) {
           return "middle";
         })
-        /*.attr("transform", function(d) {
-          return "translate(-" + d.r + "," + d.y + ")";
-        })*/
+        .attr("transform", function(d) {
+          var t = "";
+          switch (d.data.type) {
+            case "tech":
+              break;
+            case "level":
+              t = "translate(0," + (d.r + 15) + ")";
+              break;
+            case "company":
+              t = "translate(0," + (d.r * -1 - 5) + ")";
+              break;
+          }
+          return t;
+        })
         .text(function(d) {
-          return d.data.type == "tech" ? d.data.name : "";
+          return d.data.type == "root" ? "" : d.data.name;
         });
     }
   });

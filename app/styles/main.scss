@@ -2,21 +2,27 @@
 // endbower
 
 #sankey-chart-container .node rect {
-  fill-opacity: 0.9;
-  shape-rendering: crispEdges;
+	fill-opacity: 0.9;
+	shape-rendering: crispEdges;
 }
 
 #sankey-chart-container .node text {
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
+	pointer-events: none;
+	text-shadow: 0 1px 0 #fff;
 }
 
 #sankey-chart-container .link {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: 0.2;
+	fill: none;
+	stroke: #000;
+	stroke-opacity: 0.2;
 }
 
 #sankey-chart-container .link:hover {
-  stroke-opacity: 0.5;
+	stroke-opacity: 0.5;
+}
+
+#main {
+	& .qty-item {
+		font-weight: bold;
+	}
 }
