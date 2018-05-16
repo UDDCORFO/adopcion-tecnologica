@@ -12,15 +12,22 @@ angular
   .controller("MainCtrl", function(TabletopService, $scope, $rootScope) {
     $scope.rawdata = [];
 
-    $scope.loading = true;
+    $rootScope.loading = true;
 
     TabletopService.getData().then(function(data) {
-      console.log("data", data);
       $scope.rawdata = data;
 
       $scope.totales = $rootScope.groupResults(data, true);
-      console.log("totales", $scope.totales);
 
-      $scope.loading = false;
+      $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+        setTimeout(function() {
+          $(".has-tooltip")
+            .first()
+            .tooltip("show");
+        }, 2000);
+      });
+
+      $rootScope.loading = false;
     });
   });

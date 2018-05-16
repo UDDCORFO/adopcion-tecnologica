@@ -2,27 +2,84 @@
 // endbower
 
 #sankey-chart-container .node rect {
-	fill-opacity: 0.9;
-	shape-rendering: crispEdges;
+  fill-opacity: 0.9;
+  shape-rendering: crispEdges;
 }
 
 #sankey-chart-container .node text {
-	pointer-events: none;
-	text-shadow: 0 1px 0 #fff;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
 }
 
 #sankey-chart-container .link {
-	fill: none;
-	stroke: #000;
-	stroke-opacity: 0.2;
+  fill: none;
+  stroke: #000;
+  stroke-opacity: 0.2;
+}
+
+#legend-svg {
+  position: absolute;
+  right: 0;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 #sankey-chart-container .link:hover {
-	stroke-opacity: 0.5;
+  stroke-opacity: 0.5;
+}
+
+#pack-chart-container {
+  & circle {
+    fill-opacity: 1;
+    &:hover {
+      fill-opacity: 0.5;
+    }
+  }
+  & text {
+    pointer-events: none;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
 }
 
 #main {
-	& .qty-item {
-		font-weight: bold;
-	}
+  & .qty-item {
+  }
+  & .level-title {
+    font-weight: bold;
+    border-bottom: 2px solid;
+    width: 100%;
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+}
+.navbar {
+  & .navbar-nav {
+    & li {
+      &.active {
+        border-bottom: 2px solid #fd770b;
+        background-color: #eee;
+      }
+      & a {
+        color: #333;
+      }
+    }
+  }
+  & .navbar-brand {
+    color: #333;
+  }
+}
+
+#loader {
+  color: #c4c4c4;
+  font-size: 20px;
+}
+
+.legendOrdinal {
+  & .label {
+    font-size: 13px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
+  }
 }

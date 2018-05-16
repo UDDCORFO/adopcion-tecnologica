@@ -1,28 +1,27 @@
 <div id="main">
-<p class="text-center"><span ng-if="loading">Cargando...</span></p>
-<div class="row">
-  <div class="col-md-4">
-      <div class="jumbotron text-center">
-          <h1><span ng-if="!loading">{{rawdata.length}}</span><span ng-if="loading">...</span></h1>
-          <p>TOTAL</p>
-      </div>
+  <div class="row" ng-show="!loading">
+    <div class="col-md-4">
+        <div class="jumbotron text-center">
+            <h1><span ng-if="!loading">{{rawdata.length}}</span><span ng-if="loading">...</span></h1>
+            <p>TOTAL EMPRENDIMIENTOS</p>
+        </div>
+        <h3 class="text-center">Presentado por:</h3>
+        <img class="img-responsive" src="images/logo.png"/>
+    </div>
+    <div class="col-md-4" ng-repeat="(ixc,company) in totales">
+        <div class="jumbotron">
+            <h1 class="text-center"><span ng-if="!loading">{{company.total}}</span><span ng-if="loading">...</span></h1>
+            <p class="text-center">{{company.name}}</p>
+  			  <div ng-repeat="(ixl,level) in company.children">
+  			  	<span class="level-title" ng-style="{'border-color':thresdhold[level.id](100)}">{{level.name}}</span>
+  			  	<ol>
+    				  <li class="qty-item" ng-repeat="(ixt,tech) in level.children | orderBy:'-qty' ">
+    				  	{{tech.name}}<span ng-style="{'background-color':thresdhold[level.id](tech.qty)}" class="label pull-right has-tooltip" data-toggle="tooltip" data-placement="left" title="{{tech.qty}} emprendimientos de {{company.total}} '{{company.name}}' adoptaron '{{tech.name}}'">{{formatProportion(tech.qty,company.total)}}%</span>
+    				  </li>
+    				</ol>
+    			</div>
+        </div>
+    </div>
+   
   </div>
-  <div class="col-md-4" ng-repeat="(ixc,company) in totales">
-      <div class="jumbotron">
-          <h1 class="text-center"><span ng-if="!loading">{{company.total}}</span><span ng-if="loading">...</span></h1>
-          <p class="text-center">{{company.name}}</p>
-          <ul>
-			  <li ng-repeat="(ixl,level) in company.children" ng-style="{color:thresdhold[level.id](100)}">
-			  	{{level.name}}
-			  	<ol>
-				  <li class="qty-item" ng-repeat="(ixt,tech) in level.children | orderBy:'-qty' " ng-style="{color:thresdhold[level.id](tech.qty)}">
-				  	{{tech.name}} - {{tech.qty}} - Adopción: {{formatProportion(tech.qty,company.total)}}%
-				  </li>
-				</ol>
-			  </li>
-			</ul>
-      </div>
-  </div>
- 
-</div>
 </div>

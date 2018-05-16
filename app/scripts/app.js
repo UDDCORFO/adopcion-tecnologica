@@ -125,7 +125,7 @@ angular
       });
     };
   })
-  .run(function($rootScope) {
+  .run(function($rootScope, $routeParams, $location) {
     $rootScope.thresdhold = {
       basic: d3
         .scaleThreshold()
@@ -179,6 +179,19 @@ angular
           ].reverse()
         )
     };
+
+    $rootScope.legend_colors = d3
+      .scaleOrdinal()
+      .domain([
+        "Adopción de tecnología básica",
+        "Adopción de tecnología avanzada",
+        "Sin adopción"
+      ])
+      .range([
+        $rootScope.thresdhold.basic(100),
+        $rootScope.thresdhold.advanced(100),
+        $rootScope.thresdhold.none(100)
+      ]);
 
     $rootScope.tipo_colors = d3
       .scaleOrdinal()
@@ -330,5 +343,38 @@ angular
 
     $rootScope.formatProportion = function(qty, total) {
       return Math.round(qty * 100 / total);
+    };
+
+    $rootScope.$on("$routeChangeSuccess", function(e, current, pre) {
+      $rootScope.page = $location.path();
+    });
+
+    $rootScope.renderAdopcionLegend = function() {
+      var svg = d3
+        .select("#legend-svg")
+        .append("svg")
+        .attr("height", 60)
+        .attr("width", 250);
+
+      svg
+        .append("g")
+        .attr("class", "legendOrdinal")
+        .attr("transform", "translate(10,10)");
+
+      var legendOrdinal = d3
+        .legendColor()
+        .orient("vertical")
+        .labelWrap(250)
+        .shape(
+          "path",
+          d3
+            .symbol()
+            .type(d3.symbolCircle)
+            .size(70)()
+        )
+        .shapePadding(3)
+        .scale($rootScope.legend_colors);
+
+      svg.select(".legendOrdinal").call(legendOrdinal);
     };
   });

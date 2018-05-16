@@ -9,10 +9,10 @@
  */
 angular
   .module("adopcionTecnologicaApp")
-  .controller("SankeyCtrl", function(TabletopService, $scope) {
-    $scope.loading = true;
+  .controller("SankeyCtrl", function(TabletopService, $scope, $rootScope) {
+    $rootScope.loading = true;
     TabletopService.getData().then(function(data) {
-      $scope.loading = false;
+      $rootScope.loading = false;
       $scope.rawdata = data;
       renderSankeyChart();
     });
@@ -236,7 +236,7 @@ angular
       //Update
       sankeychart.svg
         .attr("width", sankeychart.w)
-        .attr("height", sankeychart.h);
+        .attr("height", sankeychart.h + 10);
 
       sankeychart.mainGroup
         .select("rect")
@@ -281,7 +281,8 @@ angular
       // add the link titles
       sankeychart.link.append("title").text(function(d) {
         var from = d.source.name;
-        return from + " → " + d.target.name + "\nCantidad: " + d.value;
+        console.log(d);
+        return from + " → " + d.target.name;
       });
 
       // add in the nodes
@@ -310,7 +311,6 @@ angular
         .append("title")
         .text(function(d) {
           var name = d.name;
-          name += "\nCantidad: " + d.value;
           return name;
         });
 

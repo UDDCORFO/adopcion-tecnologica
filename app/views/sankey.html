@@ -1,4 +1,14 @@
-<p class="text-center"><span ng-if="loading">Cargando...</span></p>
+<div class="row" ng-show="!loading">
+  <div class="col-sm-4">
+  	<p><strong>Tipo de emprendimiento</strong></p>
+  </div>
+  <div class="col-sm-4">
+  	<p class="text-center"><strong>Nivel tecnológico adoptado</strong></p>
+  </div>
+  <div class="col-sm-4">
+  	<p class="text-right"><strong>Tecnología adoptada</strong></p>
+  </div>
+</div>
 <div class="row">
   <div class="col-sm-12">
 	<div id="sankey-chart-container"></div>
