@@ -41,7 +41,7 @@
             <ul class="nav navbar-nav">
               <li ng-class="{'active':page=='/'}"><a href="#/">Resumen</a></li>
               <li ng-class="{'active':page=='/sankey'}"><a ng-href="#/sankey">Flujo de adopción</a></li>
-              <li ng-class="{'active':page=='/pack'}"><a ng-href="#/pack">Jerarquía de adopción</a></li>
+              <li ng-class="{'active':page=='/pack'}"><a ng-href="#/pack">Volumen de adopción</a></li>
             </ul>
             <p class="navbar-text navbar-right">2018</p>
           </div>
@@ -50,12 +50,12 @@
     </div>
 
     <div class="container-fluid">
+      <div ng-view=""></div>
       <div id="loader" class="text-center" ng-if="loading">
         <p><img src="images/loader.gif" /></p>
         <p>Cargando información</p>
         <img src="images/logo.png" width="500" />
       </div>
-      <div ng-view=""></div>
     </div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->

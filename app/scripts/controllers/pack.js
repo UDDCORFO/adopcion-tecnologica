@@ -9,19 +9,33 @@
  */
 angular
   .module("adopcionTecnologicaApp")
-  .controller("PackCtrl", function(TabletopService, $scope, $rootScope) {
+  .controller("PackCtrl", function(
+    TabletopService,
+    $scope,
+    $rootScope,
+    $timeout
+  ) {
     $rootScope.loading = true;
+    $scope.nodes = [];
     TabletopService.getData().then(function(data) {
       $rootScope.loading = false;
 
-      $scope.total = $rootScope.groupResults(data, true);
+      $scope.totales = $rootScope.groupResults(data, true);
+
+      $scope.totales_labels = angular.copy($scope.totales).reverse();
 
       console.log("TOTAL!", $scope.total);
 
-      renderPackChart("pack-chart-container", $scope.total);
+      renderPackChart("pack-chart-container", $scope.totales);
 
       $rootScope.renderAdopcionLegend();
     });
+
+    $scope.changeType = function() {
+      console.log("change", $scope.selectedType);
+      d3.select("#pack-legends").classed("show", false);
+      draw($scope.selectedType);
+    };
 
     function format(str) {
       return str;
@@ -30,17 +44,18 @@ angular
     var packchart = {};
 
     function renderPackChart(container, data) {
-      packchart[container] = {};
-      packchart[container].container = d3.select("#" + container);
+      packchart = {};
+      packchart.container = d3.select("#" + container);
 
-      $scope.size = packchart[container].container
-        .node()
-        .getBoundingClientRect().width;
+      $scope.size = packchart.container.node().getBoundingClientRect().width;
 
-      packchart[container].container
+      packchart.mainGroup = packchart.container
         .append("svg")
         .attr("width", $scope.size)
-        .attr("height", $scope.size);
+        .attr("height", $scope.size)
+        .append("g")
+        .attr("id", "main")
+        .style("transform", "translate(0%,-15%)");
 
       var pack = d3
         .pack()
@@ -60,29 +75,75 @@ angular
           return b.qty - a.qty;
         });
 
-      var nodes = pack(root);
+      $scope.nodes = pack(root);
 
-      console.log(nodes);
+      //console.log(nodes);
+      $scope.selectedType = $rootScope.catNames["no_tech"];
+      $timeout(function() {
+        draw($scope.selectedType);
+      }, 1000);
+    }
+
+    function draw(type) {
+      console.log("draw", type);
+      var nodes = angular.copy($scope.nodes);
+      nodes.children = nodes.children
+        .filter(function(a) {
+          return a.data.name == type;
+        })
+        .sort(function(a, b) {
+          return a.data.name > b.data.name ? 1 : -1;
+        });
 
       //Animate
-      var svgNodes = packchart[container].container
-        .select("svg")
-        .append("g")
-        .attr("id", "main")
-        .style("transform", "translate(0%,-15%)")
-        .selectAll("circle")
-        .data(nodes.descendants())
+      var svgNodes = packchart.mainGroup
+        .selectAll("g.node")
+        .data(nodes.descendants());
+
+      //exit
+      svgNodes.exit().remove();
+
+      //enter
+      svgNodes
         .enter()
         .append("g")
         .attr("class", function(d) {
           return d.children ? "node" : "leaf node";
         })
+        .each(function() {
+          var g = d3.select(this);
+          g.append("circle");
+          g
+            .append("text")
+            .style("fill", function(d) {
+              return "black";
+            })
+            .style("text-anchor", function(d) {
+              return "middle";
+            });
+        });
+
+      packchart.mainGroup
+        .selectAll("g.node")
+        .transition()
+        .ease(d3.easeElastic)
+        .duration(2000)
+        .delay(function(d, i) {
+          return i * 50;
+        })
         .attr("transform", function(d) {
           return "translate(" + d.x + "," + d.y + ")";
         });
 
-      svgNodes
-        .append("circle")
+      packchart.mainGroup
+        .selectAll("g.node")
+        .select("circle")
+        .transition()
+        .ease(d3.easeElastic)
+        .duration(2000)
+        .delay(function(d, i) {
+          return i * 50;
+        })
         .style("fill", function(d) {
           return d.data.parentType == "level"
             ? $rootScope.thresdhold[d.data.parentId](d.data.qty)
@@ -125,13 +186,17 @@ angular
           return d.r;
         });
 
-      svgNodes
-        .append("text")
-        .style("fill", function(d) {
-          return "black";
+      packchart.mainGroup
+        .selectAll("g.node")
+        .select("text")
+        .text(function(d) {
+          return ["root", "level"].indexOf(d.data.type) > -1 ? "" : d.data.name;
         })
-        .style("text-anchor", function(d) {
-          return "middle";
+        .transition()
+        .ease(d3.easeElastic)
+        .duration(2000)
+        .delay(function(d, i) {
+          return i * 50;
         })
         .attr("transform", function(d) {
           var t = "";
@@ -148,8 +213,12 @@ angular
           }
           return t;
         })
-        .text(function(d) {
-          return ["root", "level"].indexOf(d.data.type) > -1 ? "" : d.data.name;
+        .on("end", function(d, ix, tot) {
+          if (ix == tot.length - 1) {
+            $scope.selectedTypeLegend = angular.copy($scope.selectedType);
+            $scope.$apply();
+            d3.select("#pack-legends").classed("show", true);
+          }
         });
     }
   });

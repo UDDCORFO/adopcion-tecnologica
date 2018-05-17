@@ -226,7 +226,7 @@ angular
       },
       advanced: {
         adopt_digitech_bigdata: "Big Data",
-        adopt_digitech_iot: "IOT",
+        /*adopt_digitech_iot: "IOT",*/
         adopt_digitech_cloud: "Cloud",
         adopt_digitech_virtreality: "VR",
         adopt_digitech_cogtech: "Cogtech",
