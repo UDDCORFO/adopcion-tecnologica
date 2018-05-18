@@ -192,7 +192,7 @@ angular
         "Adopción de emprendimiento Tecnológico",
         "Adopción de emprendimiento No tecnológico"
       ])
-      .range(["blue", "green"]);
+      .range(["blue", "#ff9900"]);
 
     $rootScope.legend_colors = d3
       .scaleOrdinal()

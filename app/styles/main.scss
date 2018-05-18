@@ -100,6 +100,7 @@ body {
 }
 
 #balls-chart-container {
+  margin-bottom: 100px;
   & .node circle {
   }
 
@@ -117,4 +118,8 @@ body {
     stroke: #eee;
     stroke-width: 2px;
   }
+}
+
+#legend-ball-svg {
+  position: absolute;
 }
