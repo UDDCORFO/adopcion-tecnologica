@@ -13,7 +13,8 @@
     "tabletop": "^1.5.3",
     "d3": "5",
     "lodash": "^4.17.5",
-    "d3-legend": "^2.25.6"
+    "d3-legend": "^2.25.6",
+    "angular-slugify": "^1.0.1"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

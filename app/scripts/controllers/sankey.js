@@ -281,7 +281,6 @@ angular
       // add the link titles
       sankeychart.link.append("title").text(function(d) {
         var from = d.source.name;
-        console.log(d);
         return from + " → " + d.target.name;
       });
 

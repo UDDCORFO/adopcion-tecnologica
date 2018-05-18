@@ -98,3 +98,23 @@ body {
     opacity: 1;
   }
 }
+
+#balls-chart-container {
+  & .node circle {
+  }
+
+  & .node text {
+    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  & .node--internal text {
+    text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+  }
+
+  & .link {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 2px;
+  }
+}

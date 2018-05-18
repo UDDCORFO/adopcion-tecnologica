@@ -15,7 +15,8 @@ angular
     "ngResource",
     "ngRoute",
     "ngSanitize",
-    "ngTouch"
+    "ngTouch",
+    "slugifier"
   ])
   .config(function($routeProvider, $locationProvider) {
     $routeProvider
@@ -33,6 +34,11 @@ angular
         templateUrl: "views/pack.html",
         controller: "PackCtrl",
         controllerAs: "pack"
+      })
+      .when("/balls", {
+        templateUrl: "views/balls.html",
+        controller: "BallsCtrl",
+        controllerAs: "balls"
       })
       .otherwise({
         redirectTo: "/"
@@ -179,6 +185,14 @@ angular
           ].reverse()
         )
     };
+
+    $rootScope.legend_company_colors = d3
+      .scaleOrdinal()
+      .domain([
+        "Adopción de emprendimiento Tecnológico",
+        "Adopción de emprendimiento No tecnológico"
+      ])
+      .range(["blue", "green"]);
 
     $rootScope.legend_colors = d3
       .scaleOrdinal()
@@ -374,6 +388,35 @@ angular
         )
         .shapePadding(3)
         .scale($rootScope.legend_colors);
+
+      svg.select(".legendOrdinal").call(legendOrdinal);
+    };
+
+    $rootScope.renderBallsLegend = function() {
+      var svg = d3
+        .select("#legend-ball-svg")
+        .append("svg")
+        .attr("height", 60)
+        .attr("width", 400);
+
+      svg
+        .append("g")
+        .attr("class", "legendOrdinal")
+        .attr("transform", "translate(10,10)");
+
+      var legendOrdinal = d3
+        .legendColor()
+        .orient("vertical")
+        .labelWrap(400)
+        .shape(
+          "path",
+          d3
+            .symbol()
+            .type(d3.symbolCircle)
+            .size(70)()
+        )
+        .shapePadding(3)
+        .scale($rootScope.legend_company_colors);
 
       svg.select(".legendOrdinal").call(legendOrdinal);
     };
