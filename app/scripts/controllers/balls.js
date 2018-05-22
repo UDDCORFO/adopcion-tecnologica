@@ -17,9 +17,11 @@ angular
     Slug
   ) {
     $rootScope.loading = true;
-    $scope.intervalSeconds = 250;
+    $scope.intervalSeconds = 100;
+    $scope.simulation = 0;
     var intervalPromise;
     var procesados = {};
+    var totales = {};
     TabletopService.getData().then(function(data) {
       $rootScope.loading = false;
 
@@ -39,11 +41,15 @@ angular
               procesados.no_tech = 0;
               procesados[slug] = { total: 0, tech: 0, no_tech: 0 };
             }
+            if (!totales[companyType.name]) {
+              totales[companyType.name] = 100;
+            }
             $scope.networkData[tech.name] = {
               name: tech.name,
               parent: level.name
             };
-            for (var i = 0; i < tech.qty; i++) {
+            var proportion = Math.round(tech.qty * 100 / companyType.total);
+            for (var i = 0; i < proportion; i++) {
               $scope.ballsData.push({
                 tech: tech.name,
                 level: level.name,
@@ -68,7 +74,8 @@ angular
       });
 
       renderTree();
-      run();
+      $rootScope.renderBallsLegend();
+      $scope.run();
     });
 
     function getRandomTech() {
@@ -78,16 +85,35 @@ angular
       )[0];
     }
 
-    function run() {
-      $rootScope.renderBallsLegend();
+    $scope.run = function() {
+      angular.forEach(procesados, function(item, ixItem) {
+        procesados[ixItem] = { total: 0, tech: 0, no_tech: 0 };
+      });
+      procesados.tech = 0;
+      procesados.no_tech = 0;
+
+      d3
+        .selectAll(".bar_group rect")
+        .transition()
+        .attr("width", 2);
+      d3
+        .selectAll(".bar_group text")
+        .text("0%")
+        .transition()
+        .attr("x", 17);
+
       $scope.intervalData = angular.copy($scope.ballsData);
       intervalPromise = $interval(function() {
         newBall(getRandomTech());
+        $scope.simulation = Math.round(
+          100 - $scope.intervalData.length * 100 / $scope.ballsData.length
+        );
         if ($scope.intervalData.length == 0) {
+          $interval.cancel(intervalPromise);
           $scope.intervalData = angular.copy($scope.ballsData);
         }
       }, $scope.intervalSeconds);
-    }
+    };
 
     var ballTree = {};
     function renderTree() {
@@ -195,7 +221,10 @@ angular
         if (!d.children) {
           var group = d3.select(this);
           var slug = Slug.slugify(d.data.id);
-          var tGroup = group.append("g").attr("id", "bar_" + slug + "_tech");
+          var tGroup = group
+            .append("g")
+            .classed("bar_group", true)
+            .attr("id", "bar_" + slug + "_tech");
 
           tGroup
             .append("rect")
@@ -224,6 +253,7 @@ angular
 
           var ntGroup = group
             .append("g")
+            .classed("bar_group", true)
             .attr("id", "bar_" + slug + "_no_tech");
 
           ntGroup
@@ -282,6 +312,12 @@ angular
       transition(newball, firstPath, secondPath, startNode.datum().x, data);
     }
 
+    var linearScale = d3
+      .scaleLinear()
+      .domain([0, 100])
+      .range([0, 150])
+      .nice();
+
     function transition(ball, firstPath, secondPath, yOffset, data) {
       ball
         .transition()
@@ -307,13 +343,26 @@ angular
                     procesados[slug]["no_tech"]++;
                     procesados["no_tech"]++;
                   }
-                  updateTotals(
-                    procesados[slug],
-                    slug,
+
+                  //update bar & numbers
+
+                  var tech =
                     data.company == $rootScope.catNames["tech"]
                       ? "tech"
-                      : "no_tech"
+                      : "no_tech";
+
+                  var total = totales[$rootScope.catNames[tech]];
+                  var newText = Math.round(
+                    procesados[slug][tech] * 100 / total
                   );
+                  var newW = linearScale(newText);
+                  var cont = d3.select("#bar_" + slug + "_" + tech);
+                  cont.select("rect").attr("width", newW == 0 ? 2 : newW);
+                  cont
+                    .select("text")
+                    .attr("x", newW + 15)
+                    .text(newText + "%");
+
                   ball.remove();
                 });
             });
@@ -334,19 +383,4 @@ angular
     $scope.$on("$destroy", function() {
       if (intervalPromise) $interval.cancel(intervalPromise);
     });
-
-    function updateTotals(data, slug, tech) {
-      var total = procesados[tech];
-      angular.forEach(procesados, function(proc, ix) {
-        if (isNaN(proc)) {
-          var newW = Math.round(proc[tech] * 100 / total);
-          var cont = d3.select("#bar_" + ix + "_" + tech);
-          cont.select("rect").attr("width", newW == 0 ? 2 : newW);
-          cont
-            .select("text")
-            .attr("x", newW + 15)
-            .text(newW + "%");
-        }
-      });
-    }
   });
